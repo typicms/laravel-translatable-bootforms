@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypiCMS\LaravelTranslatableBootForms;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use TypiCMS\LaravelTranslatableBootForms\Form\FormBuilder;
@@ -29,7 +30,7 @@ class TranslatableBootFormsServiceProvider extends ServiceProvider
         // BootForm & TranslatableBootForm. extend() is used instead of
         // singleton() because extenders survive subsequent rebindings of the
         // abstract — register() ordering across providers is not guaranteed.
-        $this->app->extend('typicms.form', function ($formBuilder, $app): FormBuilder {
+        $this->app->extend('typicms.form', function ($formBuilder, Application $application): FormBuilder {
             if ($formBuilder instanceof FormBuilder) {
                 return $formBuilder;
             }
@@ -41,15 +42,15 @@ class TranslatableBootFormsServiceProvider extends ServiceProvider
 
             $translatableFormBuilder = new FormBuilder;
             $translatableFormBuilder->setLocales($locales);
-            $translatableFormBuilder->setErrorStore($app['typicms.form.errorstore']);
-            $translatableFormBuilder->setOldInputProvider($app['typicms.form.oldinput']);
-            $translatableFormBuilder->setToken($app['session.store']->token());
+            $translatableFormBuilder->setErrorStore($application['typicms.form.errorstore']);
+            $translatableFormBuilder->setOldInputProvider($application['typicms.form.oldinput']);
+            $translatableFormBuilder->setToken($application['session.store']->token());
 
             return $translatableFormBuilder;
         });
 
-        $this->app->singleton('translatable-bootform', function ($app): TranslatableBootForm {
-            $translatableBootForm = new TranslatableBootForm($app['typicms.bootform']);
+        $this->app->singleton('translatable-bootform', function (Application $application): TranslatableBootForm {
+            $translatableBootForm = new TranslatableBootForm($application['typicms.bootform']);
             $locales = array_keys(config('typicms.locales', []));
             if ($locales === []) {
                 $locales = config('typicms.locales');
