@@ -26,10 +26,9 @@ class TranslatableBootFormsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'translatable-bootforms');
 
-        // Override BootForm's form builder so model binding works between
-        // BootForm & TranslatableBootForm. extend() is used instead of
-        // singleton() because extenders survive subsequent rebindings of the
-        // abstract — register() ordering across providers is not guaranteed.
+        // Wrap typicms.form via extend() so the locale-aware FormBuilder is
+        // returned regardless of provider registration order. extend()
+        // survives subsequent rebindings of the abstract.
         $this->app->extend('typicms.form', function ($formBuilder, Application $application): FormBuilder {
             if ($formBuilder instanceof FormBuilder) {
                 return $formBuilder;
