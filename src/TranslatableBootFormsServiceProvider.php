@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace TypiCMS\LaravelTranslatableBootForms;
 
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use TypiCMS\LaravelTranslatableBootForms\Form\FormBuilder;
 
-class TranslatableBootFormsServiceProvider extends ServiceProvider implements DeferrableProvider
+class TranslatableBootFormsServiceProvider extends ServiceProvider
 {
     /**
      * Boot the application events.
@@ -19,6 +19,10 @@ class TranslatableBootFormsServiceProvider extends ServiceProvider implements De
         $this->publishes([
             __DIR__.'/../config/config.php' => config_path('translatable-bootforms.php'),
         ], 'typicms-config');
+
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'transbootform');
+
+        Blade::anonymousComponentNamespace('transbootform::components', 'transbootform');
     }
 
     /**
@@ -57,16 +61,5 @@ class TranslatableBootFormsServiceProvider extends ServiceProvider implements De
 
             return $translatableBootForm;
         });
-    }
-
-    /**
-     * Get the services provided by the provider.
-     */
-    public function provides(): array
-    {
-        return [
-            'typicms.form',
-            'translatable-bootform',
-        ];
     }
 }
